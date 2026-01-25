@@ -1,7 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SectionProp } from "../App";
 import type { PostgrestError } from "@supabase/supabase-js";
-import { Section } from "lucide-react";
 
 const superBaseURL = "https://cioerpzwuxotdvvimjva.supabase.co";
 const superBaseAnonKey =
