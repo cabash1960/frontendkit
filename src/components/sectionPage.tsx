@@ -4,6 +4,7 @@ import type { SectionProp } from "../App";
 import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router";
 import { StepBack, X, SquarePen } from "lucide-react";
+import { updateSection } from "../api/supabase";
 
 function SectionPage({
   sections,
@@ -14,25 +15,36 @@ function SectionPage({
 }) {
   const { id } = useParams();
   const [material, setMaterial] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // const [links, setLinks] = useState(["http://google.com"]);
   const currentSection = sections.find((s: SectionProp) => s.id === id);
   const navigate = useNavigate();
 
-  function addLinks() {
-    if (!material) return;
+  async function addLinks() {
+    if (!material || !currentSection || isSubmitting) return;
 
     const formattedLinks = material.startsWith("http")
       ? material
       : `http://${material}`;
 
-    setSections(
-      sections.map((sec) =>
-        sec.id === id
-          ? { ...sec, details: [...sec.details, formattedLinks] }
-          : sec,
-      ),
-    );
-    setMaterial("");
+    const updatedDetails = [...currentSection.details, formattedLinks];
+
+    try {
+      setIsSubmitting(true);
+      await updateSection(currentSection.id, { details: updatedDetails });
+      setSections(
+        sections.map((sec) =>
+          sec.id === id ? { ...sec, details: updatedDetails } : sec,
+        ),
+      );
+
+      setMaterial("");
+    } catch (error) {
+      console.error("Error adding link:", error);
+      alert("Failed to add link.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
   function deleteLink(index: number) {
     setSections(
@@ -65,6 +77,7 @@ function SectionPage({
           <button
             className="px-4 py-6 bg-purple-100 hover:bg-purple-200 transition-colors rounded-r-3xl "
             onClick={addLinks}
+            onKeyDown={(e) => e.key === "Enter" && addLinks()}
           >
             <SquarePen color="purple" />
           </button>
