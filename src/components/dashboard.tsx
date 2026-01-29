@@ -96,7 +96,7 @@ function Dashboard({
         onClick={() => {
           setCloseBtn(!closeBtn);
         }}
-        className={`bg-linear-to-br from-orange-50 transition-all via-rose-50 to-amber-50 min-h-screen flex gap-8 flex-col items-center justify-center `}
+        className={`bg-linear-to-br from-orange-100 transition-all via-rose-100 to-amber-100 min-h-screen flex gap-8 flex-col items-center justify-center `}
       >
         <div className=" font-extrabold text-5xl text-gray-950">
           {" "}
