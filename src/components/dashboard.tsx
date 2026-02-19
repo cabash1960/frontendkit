@@ -20,13 +20,13 @@ function Dashboard({
   const [showForm, setShowForm] = useState(false);
   const [closeBtn, setCloseBtn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setCloseBtn(false);
       }
     };
-
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
@@ -41,6 +41,7 @@ function Dashboard({
     "#06b6d4", // cyan
     "#3b82f6", // blue
   ];
+
   function getRandomColors() {
     return colors[Math.floor(Math.random() * colors.length)];
   }
@@ -59,7 +60,6 @@ function Dashboard({
     try {
       setIsSubmitting(true);
       const createdSection = await createSection(newSection);
-
       setSections([...sections, createdSection]);
       setShowForm(false);
       setnewSectionName("");
@@ -73,11 +73,9 @@ function Dashboard({
 
   async function deleteSection(index: number) {
     const sectionToDelete = sections[index];
-
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${sectionToDelete.name}?`,
+      `Are you sure you want to delete "${sectionToDelete.name}"?`,
     );
-
     if (!confirmed) return;
 
     try {
@@ -87,112 +85,109 @@ function Dashboard({
       console.error("Error deleting section:", error);
       alert("Failed to delete section. Please try again.");
     }
-
-    // setSections(sections.filter((_, i) => index !== i));
   }
+
   return (
-    <section>
+    <section className="min-h-screen overflow-hidden bg-linear-to-br from-orange-100 via-rose-100 to-amber-100">
       <div
-        onClick={() => {
-          setCloseBtn(!closeBtn);
-        }}
-        className={`bg-linear-to-br from-orange-100 transition-all via-rose-100 to-amber-100 min-h-screen flex gap-8 flex-col items-center justify-center `}
+        onClick={() => setCloseBtn(!closeBtn)}
+        className="max-w-6xl mx-auto flex flex-col gap-8 items-center justify-center min-h-screen"
       >
-        <div className=" font-extrabold text-5xl text-gray-950">
-          {" "}
-          Who is Reading ?{" "}
+        <div className="font-extrabold md:text-5xl text-3xl text-gray-950">
+          Who is Reading?
         </div>
-        {loading ? (
-          <div className="text-gray-600">Loading...</div>
-        ) : (
-          <div className="flex gap-6 justify-center items-center">
-            {sections.map((comp: SectionProp, i: number): JSX.Element => {
+
+        <div className="flex flex-wrap justify-center items-center gap-6 px-4">
+          {loading ? (
+            <div className="text-gray-600">Loading...</div>
+          ) : (
+            sections.map((comp: SectionProp, i: number): JSX.Element => {
               return (
-                <div className="flex  justify-center  transition-all items-center gap-3">
+                <div
+                  key={comp.id}
+                  className={`flex items-center ${closeBtn ? "gap-3" : "gap-0"} transition-all`}
+                >
                   <div
-                    key={comp.id}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/section/${comp.id}`);
                     }}
-                    className={`p-10 rounded-3xl cursor-pointer hover:scale-105 transition-all hover:shadow-[-11px_13px_0px_0px_#000] shadow-[-8px_8px_0px_0px_#000] ${closeBtn ? "animate-pulse" : ""}`}
-                    style={{
-                      backgroundColor: `${comp.color}`,
-                    }}
+                    className={`min-w-[8rem] text-center md:px-8 md:py-6 px-4 py-3 rounded-3xl cursor-pointer hover:scale-105 transition-all hover:shadow-[-11px_13px_0px_0px_#000] shadow-[-8px_8px_0px_0px_#000] ${closeBtn ? "animate-pulse" : ""}`}
+                    style={{ backgroundColor: comp.color }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = `${comp.color}80`;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = `${comp.color}`;
+                      e.currentTarget.style.backgroundColor = comp.color;
                     }}
                   >
-                    {" "}
-                    <p className="text-3xl">{comp.name}</p>{" "}
+                    <p className="md:text-3xl text-xl text-white whitespace-nowrap">
+                      {comp.name}
+                    </p>
                   </div>
+
                   {closeBtn && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteSection(i);
                       }}
-                      className="cursor-pointer hover:scale-110  hover:opacity-100 opacity-60 transition-all"
+                      className="cursor-pointer hover:scale-110 hover:opacity-100 opacity-60 transition-all"
                     >
-                      <X size={35} color={"red"} />
+                      <X size={35} color="red" />
                     </button>
                   )}
                 </div>
               );
-            })}
+            })
+          )}
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowForm(true);
-              }}
-              className="cursor-pointer hover:scale-110  hover:opacity-100 opacity-60 transition-all"
-            >
-              <CircleFadingPlus size={60} strokeWidth={2} color={"#6a7282"} />
-            </button>
-          </div>
-        )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowForm(true);
+            }}
+            className="cursor-pointer hover:scale-110 hover:opacity-100 opacity-60 transition-all"
+          >
+            <CircleFadingPlus size={80} strokeWidth={2} color="#6a7282" />
+          </button>
+        </div>
+
         {showForm && (
           <div className="flex justify-center items-center gap-3">
             <input
               type="text"
               value={newSectionName}
-              className="p-3 rounded-2xl border-2  text-gray-800 placeholder:text-gray-400 shadow-[-6px_6px_0px_0px_#000] outline-none focus:scale-105 transition-all border-black "
+              className="p-3 rounded-2xl border-2 text-gray-800 placeholder:text-gray-400 shadow-[-6px_6px_0px_0px_#000] outline-none focus:scale-105 transition-all border-black"
               placeholder="Add a section"
               onClick={(e) => e.stopPropagation()}
               disabled={isSubmitting}
-              onChange={(e) => {
-                setnewSectionName(e.target.value);
-              }}
+              onChange={(e) => setnewSectionName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addSection()}
+              autoFocus
             />
             <button
               onClick={addSection}
-              className="text-3xl cursor-pointer font-medium text-green-700 hover:scale-105 transition-transform"
+              className="cursor-pointer text-green-700 hover:scale-105 transition-transform"
               disabled={isSubmitting}
             >
               <Check size={35} />
-              {/* {isSubmitting ? <Check color={}"/> :  <Check/>} */}
             </button>
             <button
-              className="cursor-pointer hover:scale-110  hover:opacity-100 opacity-60  transition-all"
+              className="cursor-pointer hover:scale-110 hover:opacity-100 opacity-60 transition-all"
               onClick={() => setShowForm(false)}
             >
-              {" "}
-              <X size={35} color={"red"} />
+              <X size={35} color="red" />
             </button>
           </div>
         )}
+
         <div
           onClick={(e) => {
             e.stopPropagation();
             setCloseBtn(!closeBtn);
           }}
-          onKeyDown={(e) => e.key === "Escape" && setCloseBtn(!closeBtn)}
-          className="border rounded-2xl px-4 py-2 text-gray-500 hover:text-gray-700 transition-all"
+          className="border rounded-2xl px-4 py-2 text-gray-500 hover:text-gray-700 cursor-pointer transition-all"
         >
           Manage Account
         </div>
