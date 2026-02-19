@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import type { SectionProp } from "../App";
 import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router";
-import { StepBack, X, SquarePen } from "lucide-react";
+import { StepBack, X, SquarePen, SearchCheckIcon } from "lucide-react";
 import { updateSection } from "../api/supabase";
 
 function SectionPage({
@@ -15,6 +15,9 @@ function SectionPage({
 }) {
   const { id } = useParams();
   const [material, setMaterial] = useState("");
+  const [open, setOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchResults, setSearchResults] = useState<string[] | null>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [links, setLinks] = useState(["http://google.com"]);
   const currentSection = sections.find((s: SectionProp) => s.id === id);
@@ -47,7 +50,8 @@ function SectionPage({
     }
   }
   async function deleteLink(index: number) {
-    if (!currentSection) return;
+    if (!currentSection?.details[index]) return;
+
     const updatedDetails = currentSection.details.filter((_, i) => i !== index);
     await updateSection(currentSection.id, { details: updatedDetails });
     setSections(
@@ -57,6 +61,21 @@ function SectionPage({
     );
   }
 
+  function getSearchInput() {
+    const term = searchInput.trim().toLowerCase();
+    if (!term) return;
+
+    const filteredSearch = currentSection?.details.filter((link) =>
+      link.toLowerCase().includes(term),
+    );
+
+    return (setSearchResults(filteredSearch || []), setSearchInput(""));
+  }
+  function addSection(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    return open ? getSearchInput() : addLinks();
+  }
+  const displayedLinks = open ? (searchResults ?? []) : currentSection?.details;
   if (!currentSection) return <p>Section not found.</p>;
 
   return (
@@ -73,18 +92,48 @@ function SectionPage({
             {currentSection?.name} Kits
           </div>
           <div className="flex mt-6 shadow-[-6px_6px_0px_0px_#000] rounded-3xl border-2 border-black overflow-hidden ">
+            <button
+              disabled={isSubmitting}
+              className={`px-4 py-6 bg-green-100 hover:bg-green-200 transition-colors rounded-l-3xl ${isSubmitting ? "cursor-not-allowed" : "cursor-pointer"}`}
+              onClick={() => {
+                setOpen(!open);
+              }}
+            >
+              <SearchCheckIcon color="green" />
+            </button>
+
             <input
               type="text"
-              value={material}
-              className=" md:px-4 md:py-6 px-4 py-4 bg-white rounded-l-3xl outline-none min-w-45 md:min-w-75 "
-              placeholder="Enter link or URL..."
-              onChange={(e) => setMaterial(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addLinks()}
+              value={open ? searchInput : material}
+              className={`md:px-4 md:py-6 px-4 py-4 ${open ? "bg-green-100" : "bg-purple-100"}  outline-none min-w-45 md:min-w-75 `}
+              placeholder={
+                open ? "Search for your links..." : "Enter Link or URL"
+              }
+              onChange={(e) => {
+                if (open) {
+                  setSearchInput(e.target.value);
+                  const term = searchInput.trim().toLowerCase();
+                  if (!term) return;
+
+                  const filteredSearch = currentSection?.details.filter(
+                    (link) => link.toLowerCase().includes(term),
+                  );
+
+                  return setSearchResults(filteredSearch || []);
+                } else {
+                  setMaterial(e.target.value);
+                }
+              }}
+              onKeyDown={addSection}
             />
+
             <button
               disabled={isSubmitting}
               className={`px-4 py-6 bg-purple-100 hover:bg-purple-200 transition-colors rounded-r-3xl ${isSubmitting ? "cursor-not-allowed" : "cursor-pointer"}`}
-              onClick={addLinks}
+              onClick={() => {
+                setOpen(!open);
+                addLinks();
+              }}
             >
               <SquarePen color="purple" />
             </button>
@@ -97,7 +146,7 @@ function SectionPage({
               </p>
             ) : (
               <ul className="flex flex-col gap-5 w-full max-w-full">
-                {currentSection?.details.map((link, index) => {
+                {displayedLinks?.map((link, index) => {
                   return (
                     <li
                       key={index}
@@ -113,7 +162,11 @@ function SectionPage({
                       </a>
                       <button
                         className="cursor-pointer transition-transform  hover:scale-110"
-                        onClick={() => deleteLink(index)}
+                        onClick={() => {
+                          const realIndex =
+                            currentSection.details.indexOf(link);
+                          deleteLink(realIndex);
+                        }}
                       >
                         <X color={"red"} className="md:w-8 md:h-8  w-6 h-6" />
                       </button>

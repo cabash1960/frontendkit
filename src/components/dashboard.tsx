@@ -47,7 +47,7 @@ function Dashboard({
   }
 
   async function addSection() {
-    if (!newSectionName || isSubmitting) return;
+    if (!newSectionName || isSubmitting || sections.length >= 8) return;
     const customName = newSectionName.trim().toLowerCase();
 
     const newSection = {
