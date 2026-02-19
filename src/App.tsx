@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Route, Routes } from "react-router";
 import Dashboard from "./components/dashboard";
 import SectionPage from "./components/sectionPage";
 import { fetchSections } from "./api/supabase";
-import { getData } from "./api/api";
+// import { getData } from "./api/api";
 
 export interface SectionProp {
   id: string;
@@ -29,13 +29,6 @@ function App() {
     // },
   ]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    loadSections();
-    getData().then((data) => {
-      console.log("Data from API:", data);
-    });
-  }, []);
 
   const loadSections = async () => {
     try {
