@@ -3,14 +3,9 @@ import { Route, Routes } from "react-router";
 import Dashboard from "./components/dashboard";
 import SectionPage from "./components/sectionPage";
 import { fetchSections } from "./api/supabase";
-
-export interface SectionProp {
-  id: string;
-  name: string;
-  // icon?: string,
-  color: string;
-  details: string[];
-}
+import type { SectionProp } from "./libs/types";
+import ErrorBoundaryComp from "./errorBoundaryComp";
+import NotFound from "./notFound";
 
 function App() {
   const [sections, setSections] = useState<SectionProp[]>([
@@ -18,7 +13,7 @@ function App() {
     //   id: "frontend",
     //   name: "Frontend",
     //   color: "#8b5cf6",
-    //   details: ["React Components", "CSS Styling", "User Interface Design"],
+    //   details: [{ url: "google.com", urlName: "google.com", id: "xp4" }],
     // },
     // {
     //   id: "backend",
@@ -47,24 +42,28 @@ function App() {
 
   return (
     <div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Dashboard
-              sections={sections}
-              loading={loading}
-              setSections={setSections}
-            />
-          }
-        />
-        <Route
-          path="/section/:id"
-          element={
-            <SectionPage sections={sections} setSections={setSections} />
-          }
-        />
-      </Routes>
+      <ErrorBoundaryComp>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Dashboard
+                sections={sections}
+                loading={loading}
+                setSections={setSections}
+              />
+            }
+          />
+
+          <Route
+            path="/section/:id"
+            element={
+              <SectionPage sections={sections} setSections={setSections} />
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundaryComp>
     </div>
   );
 }

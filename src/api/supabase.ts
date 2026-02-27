@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { SectionProp } from "../App";
+import type { SectionProp } from "../libs/types";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 const superBaseURL = "https://cioerpzwuxotdvvimjva.supabase.co";
