@@ -11,7 +11,7 @@ export const supabase = createClient(superBaseURL, superBaseAnonKey);
 function showError(error: PostgrestError | null, group = "") {
   if (error) {
     console.log(`Error fetching ${group} sections:`, error);
-    throw error;
+    throw new Error(error.message);
   }
 }
 

@@ -16,8 +16,8 @@ function Errorfallback({ error, resetErrorBoundary }: FallbackProps) {
     return emptyStars;
   };
   return (
-    <div className="min-h-screen flex justify-center items-center relative overflow-hidden  bg-orange-100 ">
-      <div className="absolute top-50 right-70 bg-amber-50 px-10 py-8 rounded-3xl  border-3 border-black  shadow-[-8px_8px_0px_0px_#000] ">
+    <div className="min-h-screen flex justify-center items-center relative overflow-hidden  bg-orange-100 p-4">
+      <div className="w-full max-w-lg md:max-w-2xl bg-amber-50 px-6 py-8 md:px-10 rounded-3xl  border-3 border-black  shadow-[-8px_8px_0px_0px_#000] relative z-10">
         <div className=" flex flex-col gap-8 text-center">
           <div className="flex flex-col gap-3">
             <h1
@@ -26,7 +26,7 @@ function Errorfallback({ error, resetErrorBoundary }: FallbackProps) {
                 fontFamily: "'Bangers', cursive",
                 lineHeight: 1,
                 color: "#EF4444",
-                fontSize: "8rem",
+                fontSize: "clamp(5rem, 15vw, 8rem)",
                 WebkitTextStroke: "3px #000",
                 textShadow: "5px 5px 0 #000, -2px -2px 0 #7f1d1d",
                 letterSpacing: "0.05em",
@@ -51,7 +51,7 @@ function Errorfallback({ error, resetErrorBoundary }: FallbackProps) {
           </div>
 
           <div
-            className="flex justify-around text-center mt-5 gap-3 "
+            className="flex flex-col md:flex-row justify-around text-center mt-5 gap-4 "
             style={{
               fontFamily: "'Bangers', cursive",
 
@@ -73,11 +73,11 @@ function Errorfallback({ error, resetErrorBoundary }: FallbackProps) {
           </div>
         </div>
       </div>
-      <div className="absolute -bottom-90  left-60">
+      <div className="absolute -bottom-10 -left-10 md:bottom-10 md:left-20 opacity-50 md:opacity-100">
         <img
           src="https://i.imgur.com/kVglgtp.png"
           alt="error-image"
-          className="max-w-[200px] "
+          className="max-w-[150px] md:max-w-[200px] "
         />
       </div>
     </div>
