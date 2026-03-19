@@ -6,6 +6,7 @@ import { fetchSections } from "./api/supabase";
 import type { SectionProp } from "./libs/types";
 import ErrorBoundaryComp from "./errorBoundaryComp";
 import NotFound from "./notFound";
+import { Helmet } from "react-helmet-async";
 
 function App() {
   const [sections, setSections] = useState<SectionProp[]>([
@@ -43,6 +44,24 @@ function App() {
   return (
     <div>
       <ErrorBoundaryComp>
+        <Helmet>
+          <title>CunningKit</title>
+          <meta property="og:title" content="CunningKit" />
+          <meta property="og:description" content="Your description" />
+          <meta property="og:url" content="https://cunningkit.cabash.tech" />
+          <meta property="og:type" content="website" />
+          <meta
+            property="og:image"
+            content="https://ogimage.io/templates/photo?title=-&subtitle=Akinlabi+Blessing&image=https%3A%2F%2Fi.imgur.com%2FxQ2HjuX.jpeg"
+          />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta
+            name="twitter:image"
+            content="https://ogimage.io/templates/photo?title=-&subtitle=Akinlabi+Blessing&image=https%3A%2F%2Fi.imgur.com%2FxQ2HjuX.jpeg"
+          />
+        </Helmet>
         <Routes>
           <Route
             path="/"
