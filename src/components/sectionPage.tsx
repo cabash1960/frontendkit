@@ -24,6 +24,7 @@ function SectionPage({
   const [searchResults, setSearchResults] = useState<DetailProp[] | null>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [prevVal, setPrevVal] = useState("");
+  // const [latest, setLatest] = useState(false);
 
   const currentSection = sections.find((s: SectionProp) => s.id === id);
   const navigate = useNavigate();
@@ -34,6 +35,14 @@ function SectionPage({
     } catch {
       return url;
     }
+  }
+  function newDate(date: number) {
+    const now = new Date().getTime();
+    const prev = new Date(date).getTime();
+    const diff = now - prev;
+    const seconds = Math.floor(diff / 1000);
+    console.log(seconds);
+    return seconds;
   }
   async function addLinks() {
     if (!material || !currentSection || isSubmitting) return;
@@ -46,7 +55,12 @@ function SectionPage({
     setPrevVal(defaultLinkName);
     const updatedDetails = [
       ...currentSection.details,
-      { id: randomId, url: formattedLinks, urlName: defaultLinkName },
+      {
+        id: randomId,
+        url: formattedLinks,
+        urlName: defaultLinkName,
+        date: Date.now(),
+      },
     ];
 
     try {
@@ -150,7 +164,14 @@ function SectionPage({
     if (e.key !== "Enter") return;
     return open ? getSearchInput() : addLinks();
   }
-  const displayedLinks = open ? (searchResults ?? []) : currentSection?.details;
+
+  const sortedLinks = currentSection?.details.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  const displayedLinks = open ? (searchResults ?? []) : sortedLinks;
   if (!currentSection) return <p>Section not found.</p>;
 
   return (
@@ -226,6 +247,9 @@ function SectionPage({
                 <SquarePen color="purple" />
               </button>
             </div>
+            <div className=" mt-6">
+              <p>{currentSection?.details.length} Links</p>
+            </div>
 
             <div className="w-full  mt-6">
               {currentSection?.details.length === 0 ? (
@@ -238,8 +262,13 @@ function SectionPage({
                     return (
                       <li
                         key={link.id}
-                        className={` py-4 px-8  flex gap-3   justify-between items-center shadow-[-8px_8px_0_0_#000] bg-amber-200 rounded-3xl  cursor-pointer hover:scale-105 transition-all hover:shadow-[-10px_9px_0px_0px_#000]  border-2 border-black ${editTitleid === link.id && editTitle ? "scale-105" : "scale-100"}`}
+                        className={` py-4 px-8  flex gap-3 relative  justify-between items-center shadow-[-8px_8px_0_0_#000] bg-amber-200 rounded-3xl  cursor-pointer hover:scale-105 transition-all hover:shadow-[-10px_9px_0px_0px_#000]  border-2 border-black ${editTitleid === link.id && editTitle ? "scale-105" : "scale-100"}`}
                       >
+                        <div
+                          className={`absolute px-4 py-2 bg-purple-100 ${newDate(link.date) > 86400 ? "hidden" : "inline"} text-purple-600 -top-3 -right-3 rounded-2xl outline-2`}
+                        >
+                          new
+                        </div>
                         <div className="flex flex-col overflow-hidden">
                           <span
                             ref={(el) => {
