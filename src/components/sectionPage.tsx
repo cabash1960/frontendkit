@@ -265,7 +265,7 @@ function SectionPage({
                         className={` py-4 px-8  flex gap-3 relative  justify-between items-center shadow-[-8px_8px_0_0_#000] bg-amber-200 rounded-3xl  cursor-pointer hover:scale-105 transition-all hover:shadow-[-10px_9px_0px_0px_#000]  border-2 border-black ${editTitleid === link.id && editTitle ? "scale-105" : "scale-100"}`}
                       >
                         <div
-                          className={`absolute px-4 py-2 bg-purple-100 ${newDate(link.date) > 86400 ? "hidden" : "inline"} text-purple-600 -top-3 -right-3 rounded-2xl outline-2`}
+                          className={`absolute px-3 py-2 bg-purple-100 ${newDate(link.date) > 86400 ? "hidden" : "inline"} text-purple-600 -top-3 -right-3 rounded-2xl text-sm outline-2`}
                         >
                           new
                         </div>
