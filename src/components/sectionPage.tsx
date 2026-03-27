@@ -15,6 +15,8 @@ function SectionPage({
   setSections: Dispatch<SetStateAction<SectionProp[]>>;
 }) {
   const { id } = useParams();
+
+  
   const [material, setMaterial] = useState("");
   const [open, setOpen] = useState(false);
   const [editTitle, isEditTitle] = useState(false);
@@ -186,7 +188,10 @@ function SectionPage({
           </div>
           <div className=" flex-col gap-6 px-6 pb-12 text-gray-950 flex justify-center mt-3  items-center">
             <div className="md:text-6xl text-4xl font-bold text-nowrap">
-              {currentSection?.name} Kits
+              {currentSection?.name.length > 10
+                ? currentSection?.name.slice(0, 10) + "..."
+                : currentSection?.name}{" "}
+              Kits
             </div>
             <div className="flex mt-6 shadow-[-6px_6px_0px_0px_#000] rounded-3xl border-2 border-black overflow-hidden ">
               <button

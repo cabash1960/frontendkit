@@ -53,7 +53,7 @@ function Dashboard({
     const customName = newSectionName.trim().toLowerCase();
 
     const newSection = {
-      id: customName,
+      // id: customName,
       name: customName.charAt(0).toUpperCase() + customName.slice(1),
       color: getRandomColors(),
       details: [],
