@@ -2,11 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import type { SectionProp } from "../libs/types";
 import type { PostgrestError } from "@supabase/supabase-js";
 
-const superBaseURL = "https://cioerpzwuxotdvvimjva.supabase.co";
-const superBaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpb2VycHp3dXhvdGR2dmltanZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMDE1MTMsImV4cCI6MjA4NDg3NzUxM30.mAnTYfIXq3_isahsKzdIEdz80OUo1eg-w-00X-ktKCk";
-
-export const supabase = createClient(superBaseURL, superBaseAnonKey);
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+);
 
 function showError(error: PostgrestError | null, group = "") {
   if (error) {
