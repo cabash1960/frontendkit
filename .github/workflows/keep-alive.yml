@@ -11,8 +11,13 @@ jobs:
 
     steps:
       - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          curl -X GET \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/sections?limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          CLEAN_URL=$(echo "$SUPABASE_URL" | tr -d '\n\r ')
+          CLEAN_KEY=$(echo "$SUPABASE_ANON_KEY" | tr -d '\n\r ')
+          curl -f -X GET \
+            "$CLEAN_URL/rest/v1/sections?limit=1" \
+            -H "apikey: $CLEAN_KEY" \
+            -H "Authorization: Bearer $CLEAN_KEY"
