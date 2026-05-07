@@ -2,21 +2,31 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: "0 0 */4 * *" # runs every 4 days at midnight
-  workflow_dispatch: # lets you trigger it manually too
+    - cron: "0 0 */4 * *"
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          echo "URL hex dump:"
+          echo -n "$SUPABASE_URL" | xxd | head -5
+          echo "URL length: $(echo -n "$SUPABASE_URL" | wc -c)"
+
       - name: Ping Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          CLEAN_URL=$(echo "$SUPABASE_URL" | xargs)
-          CLEAN_KEY=$(echo "$SUPABASE_ANON_KEY" | xargs)
+          CLEAN_URL=$(printf '%s' "$SUPABASE_URL" | tr -d '[:space:]\r\n')
+          CLEAN_KEY=$(printf '%s' "$SUPABASE_ANON_KEY" | tr -d '[:space:]\r\n')
+          echo "Cleaned URL: [${CLEAN_URL}]"
           curl -f -X GET \
             "${CLEAN_URL}/rest/v1/sections?limit=1" \
             -H "apikey: ${CLEAN_KEY}" \
