@@ -23,6 +23,7 @@ function App() {
     //   details: ["API Development", "Database Management", "Authentication"],
     // },
   ]);
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

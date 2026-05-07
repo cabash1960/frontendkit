@@ -25,7 +25,9 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.4.0",
     "@eslint/js": "^9.39.1",
+    "@types/bun": "latest",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
@@ -36,7 +38,6 @@
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4",
-    "@types/bun": "latest"
+    "vite": "^7.2.4"
   }
 }
