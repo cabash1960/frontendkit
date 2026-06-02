@@ -9,26 +9,9 @@ import NotFound from "./notFound";
 import { Helmet } from "react-helmet-async";
 
 function App() {
-  const [sections, setSections] = useState<SectionProp[]>([
-    // {
-    //   id: "frontend",
-    //   name: "Frontend",
-    //   color: "#8b5cf6",
-    //   details: [{ url: "google.com", urlName: "google.com", id: "xp4" }],
-    // },
-    // {
-    //   id: "backend",
-    //   name: "Backend",
-    //   color: "#10b981",
-    //   details: ["API Development", "Database Management", "Authentication"],
-    // },
-  ]);
+  const [sections, setSections] = useState<SectionProp[]>([]);
 
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    loadSections();
-  }, []);
 
   const loadSections = async () => {
     try {
@@ -36,11 +19,37 @@ function App() {
       const data = await fetchSections();
       setSections(data);
     } catch (error) {
-      console.error("Error laoding sections:", error);
+      console.error("Error loading sections:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Try to load sections from local storage first
+    try {
+      const savedSections = localStorage.getItem("cunningkit-sections");
+      if (savedSections && savedSections !== "[]") {
+        setSections(JSON.parse(savedSections));
+      } else {
+        // If no sections in local storage, fetch from API
+        loadSections();
+      }
+    } catch (error) {
+      console.error(
+        "Failed to load sections from local storage, fetching from API.",
+        error,
+      );
+      loadSections();
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save sections to local storage whenever they change
+    if (sections.length > 0) {
+      localStorage.setItem("cunningkit-sections", JSON.stringify(sections));
+    }
+  }, [sections]);
 
   return (
     <div>
