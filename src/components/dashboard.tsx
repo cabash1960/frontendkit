@@ -51,23 +51,32 @@ function Dashboard({
   async function addSection() {
     if (!newSectionName || isSubmitting || sections.length >= 8) return;
     const customName = newSectionName.trim().toLowerCase();
+    const tempId = crypto.randomUUID();
 
     const newSection = {
-      // id: customName,
+      id: tempId,
       name: customName.charAt(0).toUpperCase() + customName.slice(1),
       color: getRandomColors(),
       details: [],
     };
 
+    // Optimistic Update: Update UI & trigger local storage save instantly
+    setSections([...sections, newSection as SectionProp]);
+    setShowForm(false);
+    setnewSectionName("");
+
     try {
       setIsSubmitting(true);
       const createdSection = await createSection(newSection);
-      setSections([...sections, createdSection]);
-      setShowForm(false);
-      setnewSectionName("");
+      // Swap the temporary section with the database-confirmed one
+      setSections((prev) =>
+        prev.map((s) => (s.id === tempId ? createdSection : s)),
+      );
     } catch (error) {
-      console.error("Error adding section:", error);
-      alert("Failed to add section. Please try again.");
+      console.warn(
+        "Saved section locally, but failed to sync to database (offline).",
+        error,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -80,12 +89,16 @@ function Dashboard({
     );
     if (!confirmed) return;
 
+    // Optimistic update
+    setSections(sections.filter((_, i) => index !== i));
+
     try {
       await deleteSections(sectionToDelete.id);
-      setSections(sections.filter((_, i) => index !== i));
     } catch (error) {
-      console.error("Error deleting section:", error);
-      alert("Failed to delete section. Please try again.");
+      console.warn(
+        "Deleted section locally, but failed to sync to database (offline).",
+        error,
+      );
     }
   }
 

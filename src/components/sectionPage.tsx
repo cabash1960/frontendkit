@@ -16,7 +16,6 @@ function SectionPage({
 }) {
   const { id } = useParams();
 
-  
   const [material, setMaterial] = useState("");
   const [open, setOpen] = useState(false);
   const [editTitle, isEditTitle] = useState(false);
@@ -55,6 +54,7 @@ function SectionPage({
 
     const defaultLinkName = getDefaultName(formattedLinks);
     setPrevVal(defaultLinkName);
+
     const updatedDetails = [
       ...currentSection.details,
       {
@@ -64,21 +64,21 @@ function SectionPage({
         date: Date.now(),
       },
     ];
-
+    setSections(
+      sections.map((sec) =>
+        sec.id === id ? { ...sec, details: updatedDetails } : sec,
+      ),
+    );
+    setMaterial("");
     try {
       setIsSubmitting(true);
       // setLinkTitle(defaultLinkName);
       await updateSection(currentSection.id, { details: updatedDetails });
-      setSections(
-        sections.map((sec) =>
-          sec.id === id ? { ...sec, details: updatedDetails } : sec,
-        ),
-      );
-
-      setMaterial("");
     } catch (error) {
-      console.error("Error adding link:", error);
-      alert("Failed to add link.");
+      console.warn(
+        "Saved link locally, but failed to sync to database (offline).",
+        error,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -87,12 +87,19 @@ function SectionPage({
     if (!currentSection?.details[index]) return;
 
     const updatedDetails = currentSection.details.filter((_, i) => i !== index);
-    await updateSection(currentSection.id, { details: updatedDetails });
     setSections(
       sections.map((sec) =>
         sec.id === id ? { ...sec, details: updatedDetails } : sec,
       ),
     );
+    try {
+      await updateSection(currentSection.id, { details: updatedDetails });
+    } catch (error) {
+      console.warn(
+        "Deleted link locally, but failed to sync to database (offline).",
+        error,
+      );
+    }
   }
 
   async function updateTitle(linkId: string) {
@@ -109,16 +116,20 @@ function SectionPage({
       }
     });
 
+    setSections(
+      sections.map((sec) =>
+        sec.id === id ? { ...sec, details: updatedLinks } : sec,
+      ),
+    );
+    isEditTitle(false);
+
     try {
       await updateSection(currentSection.id, { details: updatedLinks });
-      setSections(
-        sections.map((sec) =>
-          sec.id === id ? { ...sec, details: updatedLinks } : sec,
-        ),
-      );
-      isEditTitle(false);
     } catch (error) {
-      console.error("Error adding link:", error);
+      console.warn(
+        "Updated title locally, but failed to sync to database (offline).",
+        error,
+      );
     }
   }
 
