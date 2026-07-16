@@ -21,6 +21,7 @@
     "react-router": "^7.12.0",
     "react-router-dom": "^7.12.0",
     "react-spinners": "^0.17.0",
+    "react-toastify": "^11.1.0",
     "swr": "^2.3.8",
     "tailwindcss": "^4.1.18"
   },
@@ -28,6 +29,7 @@
     "@crxjs/vite-plugin": "^2.4.0",
     "@eslint/js": "^9.39.1",
     "@types/bun": "latest",
+    "@types/chrome": "^0.2.2",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

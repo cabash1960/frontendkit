@@ -1,7 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Bangers&family=Barrio&family=Bitcount+Grid+Double:wght@100..900&family=Bitcount+Prop+Single:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
 @import "tailwindcss";
 
 :root {
-  font-family: "Montserrat", sans-serif;
+  /* Set in tailwind.config.js */
+  /* font-family: "Montserrat", sans-serif; */
   line-height: 1.5;
   font-weight: 400;
 

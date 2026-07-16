@@ -6,7 +6,8 @@ import type { Dispatch, SetStateAction } from "react";
 import { CircleFadingPlus, X, Check } from "lucide-react";
 import { createSection, deleteSections } from "../api/supabase";
 import ErrorBoundaryComp from "../errorBoundaryComp";
-import { RingLoader } from "react-spinners";
+import { PacmanLoader } from "react-spinners";
+import { ToastContainer, Zoom, toast } from "react-toastify";
 
 function Dashboard({
   sections,
@@ -21,7 +22,6 @@ function Dashboard({
   const [newSectionName, setnewSectionName] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [closeBtn, setCloseBtn] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -31,6 +31,12 @@ function Dashboard({
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
+  }, []);
+  useEffect(() => {
+    const handleOutsideClick = () => setCloseBtn(false);
+
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
   }, []);
 
   const colors = [
@@ -49,7 +55,9 @@ function Dashboard({
   }
 
   async function addSection() {
-    if (!newSectionName || isSubmitting || sections.length >= 8) return;
+    if (!newSectionName) return;
+    if (sections.length >= 8) return notify();
+
     const customName = newSectionName.trim().toLowerCase();
     const tempId = crypto.randomUUID();
 
@@ -60,25 +68,22 @@ function Dashboard({
       details: [],
     };
 
-    // Optimistic Update: Update UI & trigger local storage save instantly
-    setSections([...sections, newSection as SectionProp]);
     setShowForm(false);
     setnewSectionName("");
 
     try {
-      setIsSubmitting(true);
       const createdSection = await createSection(newSection);
-      // Swap the temporary section with the database-confirmed one
-      setSections((prev) =>
-        prev.map((s) => (s.id === tempId ? createdSection : s)),
-      );
+      // Add the new section with the real ID from the database
+      setSections((prev) => [...prev, createdSection]);
+
+      navigate(`/section/${createdSection.id}`);
     } catch (error) {
       console.warn(
         "Saved section locally, but failed to sync to database (offline).",
         error,
       );
-    } finally {
-      setIsSubmitting(false);
+
+      setSections([...sections, newSection as SectionProp]);
     }
   }
 
@@ -101,21 +106,46 @@ function Dashboard({
       );
     }
   }
+  const notify = () =>
+    toast("No more sections allowed ⚠️", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Zoom,
+    });
 
   return (
-    <section className="min-h-screen overflow-hidden bg-linear-to-br from-orange-100 via-rose-100 to-amber-100">
+    <section className="min-h-screen overflow-hidden bg-rose-100">
       <ErrorBoundaryComp>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          transition={Zoom}
+        />
         <div
           onClick={() => setCloseBtn(!closeBtn)}
           className="max-w-6xl mx-auto flex flex-col gap-8 items-center justify-center min-h-screen"
         >
-          <div className="font-extrabold md:text-5xl text-3xl text-gray-950">
+          <div className="font-heading md:text-5xl text-3xl text-gray-950">
             Who is Reading?
           </div>
 
           <div className="flex flex-wrap justify-center items-center gap-6 px-4">
             {loading ? (
-              <RingLoader color="purple" size={36} />
+              <PacmanLoader color="purple" size={36} />
             ) : (
               sections.map((comp: SectionProp, i: number): JSX.Element => {
                 return (
@@ -128,7 +158,7 @@ function Dashboard({
                         e.stopPropagation();
                         navigate(`/section/${comp.id}`);
                       }}
-                      className={`min-w-32 text-center md:px-8 md:py-6 px-4 py-3 rounded-3xl cursor-pointer hover:scale-105 transition-all hover:shadow-[-11px_13px_0px_0px_#000] shadow-[-8px_8px_0px_0px_#000] ${closeBtn ? "animate-pulse" : ""}`}
+                      className={`min-w-32 text-center md:px-8 md:py-6 px-4 border-4  border-[#000] py-3 rounded-3xl cursor-pointer hover:scale-105 transition-all hover:shadow-[-11px_13px_0px_0px_#000] shadow-[-8px_8px_0px_0px_#000] ${closeBtn ? "animate-pulse" : ""}`}
                       style={{ backgroundColor: comp.color }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = `${comp.color}80`;
@@ -137,7 +167,7 @@ function Dashboard({
                         e.currentTarget.style.backgroundColor = comp.color;
                       }}
                     >
-                      <p className="md:text-3xl text-xl text-white whitespace-nowrap">
+                      <p className="md:text-3xl text-xl font-body text-white whitespace-nowrap">
                         {comp.name}
                       </p>
                     </div>
@@ -161,6 +191,8 @@ function Dashboard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                if (sections.length >= 8) return notify();
+
                 setShowForm(true);
               }}
               className="cursor-pointer hover:scale-110 hover:opacity-100 opacity-60 transition-all"
@@ -177,7 +209,6 @@ function Dashboard({
                 className="p-3 rounded-2xl border-2 text-gray-800 placeholder:text-gray-400 shadow-[-6px_6px_0px_0px_#000] outline-none focus:scale-105 transition-all border-black"
                 placeholder="Add a section"
                 onClick={(e) => e.stopPropagation()}
-                disabled={isSubmitting}
                 onChange={(e) => setnewSectionName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addSection()}
                 autoFocus
@@ -185,7 +216,6 @@ function Dashboard({
               <button
                 onClick={addSection}
                 className="cursor-pointer text-green-700 hover:scale-105 transition-transform"
-                disabled={isSubmitting}
               >
                 <Check size={35} />
               </button>
