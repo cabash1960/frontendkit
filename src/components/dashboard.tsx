@@ -120,7 +120,7 @@ function Dashboard({
     });
 
   return (
-    <section className="min-h-screen overflow-hidden bg-rose-100">
+    <section className="min-h-screen overflow-hidden bg-rose-100 bg-[url(/blob-scene-haikei.svg)] bg-cover bg-center bg-no-repeat  ">
       <ErrorBoundaryComp>
         <ToastContainer
           position="top-right"
@@ -139,7 +139,7 @@ function Dashboard({
           onClick={() => setCloseBtn(!closeBtn)}
           className="max-w-6xl mx-auto flex flex-col gap-8 items-center justify-center min-h-screen"
         >
-          <div className="font-heading md:text-5xl text-3xl text-gray-950">
+          <div className="font-Sofia font-bold md:text-6xl text-3xl text-gray-950">
             Who is Reading?
           </div>
 

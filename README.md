@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# CunningKit
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Chrome extension for saving and organizing links without breaking your
+browsing flow. Right-click any page, link, or selected text to save it
+straight into a custom section — then browse, search, and manage everything
+from the extension popup.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Right-click to save** — Save the current page, a specific link, or
+  selected text via the context menu, no tab-switching required
+- **Custom sections** — Organize links into categories you create
+- **Search** — Quickly find a saved link by title or URL
+- **Editable titles** — Auto-generated from the page, or rename with a click
+- **Offline-first** — Links save locally first via `chrome.storage.local`,
+  with a `localStorage` fallback and Supabase sync for persistence across
+  devices
+- **Live sync** — Links added via the right-click menu appear instantly in
+  the popup, no reopening required
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- Supabase (remote persistence)
+- Chrome Extensions API (`contextMenus`, `storage`)
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Install dependencies:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Run the dev server (for UI development in a regular browser tab):
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+## Building the extension
+
+```bash
+npm run build
+```
+
+This outputs a production build to `dist/`. To load it as an unpacked
+extension locally:
+
+1. Go to `chrome://extensions`
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked**
+4. Select the `dist` folder
+
+## Packaging for the Chrome Web Store
+
+From inside the `dist` folder:
+
+**PowerShell:**
+
+```powershell
+Compress-Archive -Path .\* -DestinationPath ..\cunningkit.zip -Force
+```
+
+**macOS/Linux:**
+
+```bash
+zip -r ../cunningkit.zip .
+```
+
+Make sure `manifest.json` sits at the root of the resulting zip, not nested
+inside a subfolder, then upload it via the
+[Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
+
+## Project structure

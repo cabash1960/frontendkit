@@ -42,7 +42,7 @@ function SectionPage({
     const prev = new Date(date).getTime();
     const diff = now - prev;
     const seconds = Math.floor(diff / 1000);
-    console.log(seconds);
+
     return seconds;
   }
   async function addLinks() {
@@ -188,7 +188,7 @@ function SectionPage({
   if (!currentSection) return <p>Section not found.</p>;
 
   return (
-    <section className="bg-amber-50 min-h-screen  text-gray-950 p-6 overflow-hidden">
+    <section className="section-scrollbar h-screen overflow-y-auto text-gray-950 p-6  bg-[url(/stacked-steps-haikei.svg)] bg-cover bg-no-repeat bg-center ">
       <ErrorBoundaryComp>
         <div className="max-w-6xl mx-auto">
           <div
@@ -198,7 +198,7 @@ function SectionPage({
             <StepBack /> <span className="hidden md:block">Back</span>{" "}
           </div>
           <div className=" flex-col gap-6 px-6 pb-12 text-gray-950 flex justify-center mt-3  items-center">
-            <div className="md:text-6xl text-4xl font-bold text-nowrap">
+            <div className="md:text-6xl text-4xl font-bold text-nowrap font-Sofia">
               {currentSection?.name.length > 10
                 ? currentSection?.name.slice(0, 10) + "..."
                 : currentSection?.name}{" "}
@@ -263,7 +263,7 @@ function SectionPage({
                 <SquarePen color="purple" />
               </button>
             </div>
-            <div className=" mt-6">
+            <div className=" mt-6  font-Sofia">
               <p>{currentSection?.details.length} Links</p>
             </div>
 
