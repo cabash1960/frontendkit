@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), buildManifest()],
   base: "./",
   build: {
-    outDir: `dist-${target}`,
+    outDir: process.env.TARGET ? `dist-${target}` : "dist",
     rollupOptions: {
       input: {
         main: "index.html",
