@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:chrome": "cross-env TARGET=chrome tsc -b && cross-env TARGET=chrome vite build",
+    "build:firefox": "cross-env TARGET=firefox tsc -b && cross-env TARGET=firefox vite build",
+    "lint:firefox": "web-ext lint --source-dir dist-firefox",
+    "run:firefox": "web-ext run --source-dir dist-firefox",
+    "zip:firefox": "web-ext build --source-dir dist-firefox --artifacts-dir web-ext-artifacts --overwrite-dest"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.1",
@@ -35,12 +40,14 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "web-ext": "^10.8.0"
   }
 }

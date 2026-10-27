@@ -2,7 +2,8 @@
 
 const PARENT_CONTEXT_MENU_ID = "add-to-cunningkit-parent";
 
-let lastSectionSignature = "";
+// Firefox exposes promise-based `browser`; Chrome only has `chrome`
+const api = globalThis.browser ?? globalThis.chrome;
 let isRebuilding = false;
 let rebuildQueued = false;
 
@@ -53,7 +54,6 @@ async function buildContextMenus() {
   });
 
   const sections = await getStoredSections();
-  lastSectionSignature = getSectionSignature(sections);
 
   if (sections.length > 0) {
     // Create children sequentially, AFTER the parent create() resolved above
@@ -108,26 +108,23 @@ chrome.runtime.onStartup.addListener(() => {
   rebuildContextMenus();
 });
 
-// Only rebuild when the section SET (ids/names) actually changes —
-// not on every link addition to a section's details.
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === "local" && changes.sections) {
-    const newSections = changes.sections.newValue || [];
-    const newSignature = getSectionSignature(newSections);
+  if (areaName !== "local" || !changes.sections) return;
 
-    if (newSignature !== lastSectionSignature) {
-      lastSectionSignature = newSignature;
-      rebuildContextMenus();
-    }
+  const oldSig = getSectionSignature(changes.sections.oldValue || []);
+  const newSig = getSectionSignature(changes.sections.newValue || []);
+
+  if (oldSig !== newSig) {
+    rebuildContextMenus();
   }
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  console.log("CLICKED ->", info.menuItemId, typeof info.menuItemId);
   const menuItemId = String(info.menuItemId);
   if (!menuItemId.startsWith("add-to-section-")) return;
 
   const sectionId = menuItemId.replace("add-to-section-", "");
+  const pageUrl = info.pageUrl || tab?.url;
 
   let linkData;
   if (info.linkUrl) {
@@ -136,15 +133,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       urlName: info.selectionText || info.linkUrl,
     };
   } else if (info.selectionText) {
-    linkData = { url: tab.url, urlName: info.selectionText };
+    linkData = { url: pageUrl, urlName: info.selectionText };
   } else {
-    linkData = { url: tab.url, urlName: tab.title || tab.url };
+    linkData = { url: pageUrl, urlName: tab?.title || pageUrl };
   }
 
   if (!linkData.url) return;
 
   try {
-    const data = await chrome.storage.local.get("sections");
+    const data = await api.storage.local.get("sections");
     if (!data.sections) {
       console.warn("No sections found in storage; cannot add link.");
       return;
@@ -173,11 +170,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       return section;
     });
 
-    await chrome.storage.local.set({ sections: updatedSections });
+    await api.storage.local.set({ sections: updatedSections });
 
-    if (chrome.notifications) {
+    if (api.notifications) {
       const targetSection = data.sections.find((s) => s.id === sectionId);
-      chrome.notifications.create({
+      api.notifications.create({
         type: "basic",
         iconUrl: "icons/icon128.png",
         title: "CunningKit",
